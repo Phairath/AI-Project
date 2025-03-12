@@ -18,7 +18,7 @@ with st.sidebar:
         menu_icon="list-ul", icons = ['house', 'box'], default_index=0,orientation = 'horizontal')
 
 # st.sidebar.success("Neural Network")
-st.sidebar.success('**Explore** a [Titanic Dataset](%s)' %'https://github.com/datasciencedojo/datasets/blob/master/titanic.csv')
+st.sidebar.success('**Explore** the [Titanic Dataset](%s)' %'https://github.com/datasciencedojo/datasets/blob/master/titanic.csv')
 st.sidebar.success('**Created by** Phairath Jaradnaparatana 6604062630382 SEC.2')
 st.sidebar.success("**Powered by** [Streamlit](https://streamlit.io/)")
 
