@@ -1,6 +1,7 @@
 import streamlit as st
 from streamlit_option_menu import option_menu
 import pandas as pd
+import numpy as np
 import plotly.express as px
 from sklearn.preprocessing import MinMaxScaler
 # import pages.page1 as page1
@@ -100,26 +101,32 @@ if page_selected == 'Main':
     num_shown3 = st.slider('Slide to expand data: ',min_value=5,max_value=len(df_clean_titanic),value=5,key='slider3')
     st.dataframe(df_clean_titanic[:num_shown3])
     st.write('### - Visualize and Remove Outliers')
-    fig1 = px.box(df_clean_titanic,x=['Age'],
-                hover_data=['Survived'],title='Age',width=700)
-    fig2 = px.box(df_clean_titanic,x=['SibSp'],
-                hover_data=['Survived'],title='SibSp',width=700)
-    fig3 = px.box(df_clean_titanic,x=['Parch'],
+    cols = st.columns(2)
+    with cols[0]:
+        fig1 = px.box(df_clean_titanic,x=['Age'],
+                    hover_data=['Survived'],title='Age',width=700)
+        st.write(fig1)
+        fig3 = px.box(df_clean_titanic,x=['Parch'],
                 hover_data=['Survived'],title='Parch',width=700)
-    fig4 = px.box(df_clean_titanic,x=['Fare'],
-                hover_data=['Survived'],title='Fare',width=700)
-    st.write(fig1)
+        st.write(fig3)
+    with cols[1]:
+        fig2 = px.box(df_clean_titanic,x=['SibSp'],
+                    hover_data=['Survived'],title='SibSp',width=700)
+        st.write(fig2)
+        fig4 = px.box(df_clean_titanic,x=['Fare'],
+                    hover_data=['Survived'],title='Fare',width=700)
+        st.write(fig4)
     with st.echo():
-        df_clean_titanic.drop(df_clean_titanic[df_clean_titanic['Age'] >= 0.824].index, inplace=True)
-    st.write(fig2)
-    with st.echo():
-        df_clean_titanic.drop(df_clean_titanic[df_clean_titanic['SibSp'] >= 0.6].index, inplace=True)
-    st.write(fig3)
-    with st.echo():
-        df_clean_titanic.drop(df_clean_titanic[df_clean_titanic['Parch'] >= 0.5].index, inplace=True)
-    st.write(fig4)
-    with st.echo():
-        df_clean_titanic.drop(df_clean_titanic[df_clean_titanic['Fare'] >= 0.138].index, inplace=True)
+        df_clean_titanic = df_clean_titanic[df_clean_titanic['Age'] < 0.824]
+        df_clean_titanic = df_clean_titanic[df_clean_titanic['SibSp'] < 0.6]
+        df_clean_titanic = df_clean_titanic[df_clean_titanic['Parch'] < 0.5]
+        df_clean_titanic = df_clean_titanic[df_clean_titanic['Fare'] < 0.138]
+
+        # df_clean_titanic.drop(df_clean_titanic[df_clean_titanic['Age'] >= 0.824].index,inplace=True)
+        # df_clean_titanic.drop(df_clean_titanic[df_clean_titanic['SibSp'] >= 0.6].index,inplace=True)
+        # df_clean_titanic.drop(df_clean_titanic[df_clean_titanic['Parch'] >= 0.5].index,inplace=True)
+        # df_clean_titanic.drop(df_clean_titanic[df_clean_titanic['Fare'] >= 0.138].index,inplace=True)
+
     # q1 = df_clean_titanic['Age'].quantile(0.25)
     # q3 = df_clean_titanic['Age'].quantile(0.75)
     # iqr = q3-q1
@@ -129,45 +136,218 @@ if page_selected == 'Main':
     # st.write(outliers)
     num_shown4 = st.slider('Slide to expand data: ',min_value=5,max_value=len(df_clean_titanic),value=5,key='slider4')
     st.dataframe(df_clean_titanic[:num_shown4])
-    st.write('### Number of Survived: (ควรใส่ไหม ??)',df_clean_titanic[df_clean_titanic['Survived'] == 1].shape[0],'/',df_clean_titanic.shape[0])
+    # st.write('### Number of Survived: (ควรใส่ไหม ??)',df_clean_titanic[df_clean_titanic['Survived'] == 1].shape[0],'/',df_clean_titanic.shape[0])
     st.write('---')
-    st.write('## Step 2: Model Training')
-
-
     
+
+    st.write('## Step 2: Model Training and Evaluation')
+    st.write('### - K-Nearest Neighbors (KNN)')
+    st.write('**1. Import Libraries for KNN Classification**')
+    with st.echo():
+        from sklearn.neighbors import KNeighborsClassifier
+        from sklearn.model_selection import train_test_split
+        from sklearn.metrics import accuracy_score, precision_score, recall_score, f1_score
+    st.write('**2. Split Dataset with 70% for Training and 30% for Testing**')
+    with st.echo():
+        x = df_clean_titanic.drop(columns=['Survived'])
+        y = df_clean_titanic['Survived']
+        x_train, x_test, y_train, y_test = train_test_split(x, y, test_size=0.30, random_state=99)
+    st.write('**3. Create and Train KNN Model with neighbors=4**')
+    with st.echo():
+        knn = KNeighborsClassifier(n_neighbors = 4)
+        knn.fit(x_train,y_train)
+    st.write('**4. Evaluate KNN Model**')
+    with st.echo():
+        predict_knn = knn.predict(x_test)
+        accuracy_knn = accuracy_score(y_test,predict_knn)
+        precision_knn = precision_score(y_test, predict_knn, average='macro')
+        recall_knn = recall_score(y_test, predict_knn, average="macro")
+        f1_knn = f1_score(y_test, predict_knn, average="macro")
+        # conf_matrix_knn = confusion_matrix(y_test, predict_knn)
+    # st.write("KNN efficiency \n")
+    cols = st.columns(4)
+    with cols[0]:
+        st.write(f"#### **Accuracy :** {accuracy_knn*100:.5f} %")
+    with cols[1]:
+        st.write(f"#### **Precision :** {precision_knn*100:.5f} %")
+    with cols[2]:
+        st.write(f"#### **Recall :** {recall_knn*100:.5f} %")
+    with cols[3]:
+        st.write(f"#### **F1-Score :** {f1_knn*100:.5f} %")
+
+    st.write('\n')
+    st.write('### - Support Vector Machine (SVM)')
+    st.write('**1. Import Libraries for SVM Classification**')
+    with st.echo():
+        from sklearn.svm import SVC
+        from sklearn.model_selection import train_test_split
+        from sklearn.metrics import accuracy_score, precision_score, recall_score, f1_score
+    st.write('**2. Split Dataset with 70% for Training and 30% for Testing**')
+    with st.echo():
+        x = df_clean_titanic.drop(columns=['Survived'])
+        y = df_clean_titanic['Survived']
+        x_train, x_test, y_train, y_test = train_test_split(x, y, test_size=0.30, random_state=99)
+    st.write('**3. Create and Train SVM Model**')
+    with st.echo():
+        svm_model = SVC(kernel='linear',C=0.1,probability=True)
+        svm_model.fit(x_train,y_train)
+    st.write('**4. Evaluate KNN Model**')
+    with st.echo():
+        predict_svm = svm_model.predict(x_test)
+        accuracy_svm = accuracy_score(y_test,predict_svm)
+        precision_svm = precision_score(y_test, predict_svm, average='macro')
+        recall_svm = recall_score(y_test, predict_svm, average="macro")
+        f1_svm = f1_score(y_test, predict_svm, average="macro")
+    cols = st.columns(4)
+    with cols[0]:
+        st.write(f"#### **Accuracy :** {accuracy_svm*100:.5f} %")
+    with cols[1]:
+        st.write(f"#### **Precision :** {precision_svm*100:.5f} %")
+    with cols[2]:
+        st.write(f"#### **Recall :** {recall_svm*100:.5f} %")
+    with cols[3]:
+        st.write(f"#### **F1-Score :** {f1_svm*100:.5f} %")
+
+    st.write('\n')
+    st.write('### - Decision Tree')
+    st.write('**1. Import Libraries for Decision Tree Classification**')
+    with st.echo():
+        # from sklearn import tree
+        from sklearn.tree import DecisionTreeClassifier
+        from sklearn.model_selection import train_test_split
+        from sklearn.metrics import accuracy_score, precision_score, recall_score, f1_score
+    st.write('**2. Split Dataset with 70% for Training and 30% for Testing**')
+    with st.echo():
+        x = df_clean_titanic.drop(columns=['Survived'])
+        y = df_clean_titanic['Survived']
+        x_train, x_test, y_train, y_test = train_test_split(x, y, test_size=0.30, random_state=99)
+    st.write('**3. Create and Train Decision Tree Model**')
+    with st.echo():
+        tree_model = DecisionTreeClassifier(random_state=99)
+        tree_model.fit(x_train,y_train)
+    st.write('**4. Evaluate Decision Tree Model**')
+    with st.echo():
+        predict_tree = tree_model.predict(x_test)
+        accuracy_tree = accuracy_score(y_test,predict_tree)
+        precision_tree = precision_score(y_test, predict_tree, average='macro')
+        recall_tree = recall_score(y_test, predict_tree, average="macro")
+        f1_tree = f1_score(y_test, predict_tree, average="macro")
+    cols = st.columns(4)
+    with cols[0]:
+        st.write(f"#### **Accuracy :** {accuracy_tree*100:.5f} %")
+    with cols[1]:
+        st.write(f"#### **Precision :** {precision_tree*100:.5f} %")
+    with cols[2]:
+        st.write(f"#### **Recall :** {recall_tree*100:.5f} %")
+    with cols[3]:
+        st.write(f"#### **F1-Score :** {f1_tree*100:.5f} %")
+
+    st.write('\n')
+    st.write('### - Ensemble Learning with VotingClassifier')
+    with st.echo():
+        from sklearn.ensemble import VotingClassifier
+        x = df_clean_titanic.drop(columns=['Survived'])
+        y = df_clean_titanic['Survived']
+        x_train, x_test, y_train, y_test = train_test_split(x, y, test_size=0.30, random_state=99)
+        voting_model = VotingClassifier(estimators=[
+            ('decision_tree', tree_model),
+            ('svm', svm_model),
+            ('knn', knn)
+            ], voting='hard')
+        voting_model.fit(x_train, y_train)
+        predict_voting = voting_model.predict(x_test)
+        accuracy_voting = accuracy_score(y_test,predict_voting)
+        precision_voting = precision_score(y_test, predict_voting, average='macro')
+        recall_voting = recall_score(y_test, predict_voting, average="macro")
+        f1_voting = f1_score(y_test, predict_voting, average="macro")
+    cols = st.columns(4)
+    with cols[0]:
+        st.write(f"#### **Accuracy :** {accuracy_voting*100:.5f} %")
+    with cols[1]:
+        st.write(f"#### **Precision :** {precision_voting*100:.5f} %")
+    with cols[2]:
+        st.write(f"#### **Recall :** {recall_voting*100:.5f} %")
+    with cols[3]:
+        st.write(f"#### **F1-Score :** {f1_voting*100:.5f} %")
+
+    # st.write('\n')
+    # st.write('## Step 3: Model Visualization')
+    # accuracies = [accuracy_knn*100, accuracy_svm*100, accuracy_tree*100, accuracy_voting*100]
+    # labels = ['KNN', 'SVM', 'Decision Tree', 'Voting Classifier']
+    # fig5 = px.bar(y=accuracies,x=labels,
+    #                 title='Test',width=700)
+    # st.write(fig5)
+
+
 
 if page_selected == 'Model':
+    st.markdown('#### **Input your data for predict**')
     cols = st.columns(2)
     with cols[0]:
-        st.write('Input your data for predict')
         pClass = st.selectbox('Passenger Class',('1st class','2nd class','3rd class'))
         # st.number_input('Passenger Class (1 = 1st class, 2 = 2nd class, 3 = 3rd class)',min_value=1,max_value=3)
-        sex = st.selectbox('Sex',('Male','Female'))
         # st.number_input('Sex (1 = Male, 2 = Female)',min_value=1,max_value=2)
         age = st.number_input('Age',min_value=1)
-        sibSp = st.number_input('Siblings/Spouses Aboard',min_value=0)
         parch = st.number_input('Parents/Children Aboard',min_value=0)
+        embarked = st.selectbox('Port of Embarkation',('Cherbourg','Queenstown','Southampton'))
         btn1 = st.button('Predict!')
-        if btn1:
-            st.write('Prediction not availible now. Pls wait!!!')
+        
         
     with cols[1]:
-        st.write('### Data Description')
-        df_description = pd.DataFrame({
-            'Variable': ['Pclass','Age','Parch','SibSp','Embarked'],
-            'Definition': ['Ticket class','Age in years','\# of parents / children aboard the Titanic',
-                           '\# of siblings / spouses aboard the Titanic',
-                           'Port of Embarkation (C = Cherbourg, Q = Queenstown, S = Southampton)']
-        })
-        st.table(df_description)
+        sex = st.selectbox('Sex',('Male','Female'))
+        sibSp = st.number_input('Siblings/Spouses Aboard',min_value=0)
+        fare = st.number_input('Fare (USD)',min_value=0)
+        # st.write('### Data Description')
+        # df_description = pd.DataFrame({
+        #     'Variable': ['Pclass','Age','Parch','SibSp','Embarked'],
+        #     'Definition': ['Ticket class','Age in years','\# of parents / children aboard the Titanic',
+        #                    '\# of siblings / spouses aboard the Titanic',
+        #                    'Port of Embarkation (C = Cherbourg, Q = Queenstown, S = Southampton)']
+        # })
+        # st.table(df_description)
 
-        code = '''print('hello')'''
-        st.code(code,language='python')
-        btn1 = st.button('Run!')
-        if (btn1):
-            st.write('haha')
+        # code = '''print('hello')'''
+        # st.code(code,language='python')
+        # btn1 = st.button('Run!')
+        # if (btn1):
+        #     st.write('haha')
+    if btn1:
+        # scaler = MinMaxScaler()
+        import pickle
+        with open('.\model\supervised.pkl', 'rb') as file:
+            loaded_model = pickle.load(file)
+        x_new = {'Pclass':[pClass],
+                   'Sex': [sex],
+                   'Age':[age],
+                   'SibSp':[sibSp],
+                   'Parch':[parch],
+                   'Fare':[fare],
+                   'Embarked':[embarked]}
+        df_x_new = pd.DataFrame(x_new)
+        df_x_new['Pclass'] = df_x_new['Pclass'].map({'1st class': 1,'2nd class': 2,'3rd class':3})
+        df_x_new['Sex'] = df_x_new['Sex'].map({'Male': 0,'Female': 1})
+        df_x_new['Embarked'] = df_x_new['Embarked'].map({'Cherbourg': 0,'Queenstown': 1,'Southampton': 2})
+        columns_to_scale = ['Pclass','Sex','Age','SibSp','Parch','Fare','Embarked']
+        df_new_scaled = df_x_new.copy()
+        # df_new_scaled[columns_to_scale] = loaded_model.transform(df_x_new[columns_to_scale])
+        st.write(df_new_scaled)
+        # df_clean_titanic['Age'] = scaler.fit_transform(df_clean_titanic[['Age']])
+        # df_clean_titanic['SibSp'] = scaler.fit_transform(df_clean_titanic[['SibSp']])
+        # df_clean_titanic['Parch'] = scaler.fit_transform(df_clean_titanic[['Parch']])
+        # df_clean_titanic['Fare'] = scaler.fit_transform(df_clean_titanic[['Fare']])
+        # df_clean_titanic['Embarked'] = scaler.fit_transform(df_clean_titanic[['Embarked']])
+        st.write(df_x_new)
 
-    
+        
+        prediction = loaded_model.predict(df_x_new)
+        st.write(prediction)
+
+
+        # predict = loaded_model.predict(x_new)
+        # st.write(predict)
+        # x_new_scaled = scaler.transform(x_new)
+        # st.write(x_new_scaled)
+        st.write('Prediction not availible now. Pls wait!!!')
 
 
 
