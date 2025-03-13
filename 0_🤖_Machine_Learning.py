@@ -4,7 +4,6 @@ import pandas as pd
 import numpy as np
 import plotly.express as px
 from sklearn.preprocessing import MinMaxScaler
-# import pages.page1 as page1
 st.set_page_config(
     page_title = 'Machine Learning',
     page_icon = '🤖',
@@ -15,46 +14,17 @@ st.set_page_config(
 with st.sidebar:
     page_selected = option_menu('Pages', ['Main', 'Model'], 
         menu_icon="list-ul", icons = ['house', 'box'], default_index=0,orientation = 'horizontal')
-    # page_selected
 
 # page_option = st.sidebar.radio('Choose Page', ['Main','Model'])
-
 # st.sidebar.success("Machine Learning")
 st.sidebar.success('**Explore** the [Titanic Dataset](%s)' %'https://github.com/datasciencedojo/datasets/blob/master/titanic.csv')
-# st.sidebar.markdown("<br>"*6, unsafe_allow_html=True)
-
-
 st.sidebar.success('**Created by** Phairath Jaradnaparatana 6604062630382 SEC.2')
 st.sidebar.success("**Powered by** [Streamlit](https://streamlit.io/)")
-
-# st.sidebar.markdown("""
-#     <p style="text-align: center; font-size: 16px; color: gray;">Created by Phairath Jaradnaparatana 6604062630382 SEC.2</p>
-#     """, unsafe_allow_html=True)
-# st.sidebar.markdown("""
-#     <p style="text-align: center; font-size: 16px; color: gray;">Powered by Streamlit</p>
-#     """, unsafe_allow_html=True)
-# st.sidebar.markdown("**Powered by Streamlit**")
-
 
 st.title('🚢 Titanic Survival Simulator: Test Your Fate with Data!')
 st.write('#### \# Supervised learning leverages Ensemble Learning techniques to enhance model performance')
 st.markdown('#### \# K-Nearest Neighbors (KNN), Support Vector Machine (SVM), Decision Tree')
 st.markdown('<span style="color: red; font-size: 20px;">\****Information about the dataset and other details can be found in the sidebar**</span> ', unsafe_allow_html=True)
-# st.markdown(
-#     """
-#     <style>
-#     .title {
-#         text-align: center;
-#         font-size: 40px;
-#         font-weight: bold;
-#     }
-#     </style>
-#     <div class="title">
-#         My Streamlit App Title
-#     </div>
-#     """, 
-#     unsafe_allow_html=True
-# )
 
 @st.cache_data(persist=True)
 def load_data(url):
@@ -68,6 +38,7 @@ if page_selected == 'Main':
     # st.dataframe(df_titanic)
     num_shown = st.slider('Slide to expand data: ',min_value=5,max_value=len(df_titanic),value=5,key='slider1')
     st.dataframe(df_titanic[:num_shown])
+
     st.write('### - Data Description (Focus on Abbreviated Features)')
     df_description = pd.DataFrame({
         'Variable': ['Pclass','Parch','SibSp','Embarked'],
@@ -76,6 +47,7 @@ if page_selected == 'Main':
                         'Port of Embarkation (C = Cherbourg, Q = Queenstown, S = Southampton)']
     })
     st.table(df_description)
+
     st.write('### - Remove irrelevant columns for model training')
     with st.echo():
         df_clean_titanic = df_titanic.drop(columns=['PassengerId','Name','Ticket','Cabin'])
@@ -131,7 +103,7 @@ if page_selected == 'Main':
         df_clean_titanic = df_clean_titanic[df_clean_titanic['Parch'] < 0.5]
         df_clean_titanic = df_clean_titanic[df_clean_titanic['Fare'] < 0.138]
         # df_clean_titanic.drop(df_clean_titanic[df_clean_titanic['Age'] >= 0.824].index,inplace=True)
-        # df_clean_titanic.drop(df_clean_titanic[df_clean_titanic['SibSp'] >= 0.6].index,inplace=True)
+        # df_clean_titanic.drop(df_clean_titanic[df_clean_titanic['SibSp'] >= 0.375].index,inplace=True)
         # df_clean_titanic.drop(df_clean_titanic[df_clean_titanic['Parch'] >= 0.5].index,inplace=True)
         # df_clean_titanic.drop(df_clean_titanic[df_clean_titanic['Fare'] >= 0.138].index,inplace=True)
 
@@ -144,10 +116,9 @@ if page_selected == 'Main':
     # st.write(outliers)
     num_shown4 = st.slider('Slide to expand data: ',min_value=5,max_value=len(df_clean_titanic),value=5,key='slider4')
     st.dataframe(df_clean_titanic[:num_shown4])
-    # st.write('### Number of Survived: (ควรใส่ไหม ??)',df_clean_titanic[df_clean_titanic['Survived'] == 1].shape[0],'/',df_clean_titanic.shape[0])
+    # st.write('### Number of Survived: ',df_clean_titanic[df_clean_titanic['Survived'] == 1].shape[0],'/',df_clean_titanic.shape[0])
     st.write('---')
     
-
     st.write('## Step 2: Model Training and Evaluation')
     st.write('### - K-Nearest Neighbors (KNN)')
     st.write('**1. Import Libraries for KNN Classification**')
@@ -220,7 +191,6 @@ if page_selected == 'Main':
     st.write('### - Decision Tree')
     st.write('**1. Import Libraries for Decision Tree Classification**')
     with st.echo():
-        # from sklearn import tree
         from sklearn.tree import DecisionTreeClassifier
         from sklearn.model_selection import train_test_split
         from sklearn.metrics import accuracy_score, precision_score, recall_score, f1_score
@@ -261,7 +231,7 @@ if page_selected == 'Main':
             ('decision_tree', tree_model),
             ('svm', svm_model),
             ('knn', knn)
-            ], voting='hard')
+            ], voting='soft')
         voting_model.fit(x_train, y_train)
         predict_voting = voting_model.predict(x_test)
         accuracy_voting = accuracy_score(y_test,predict_voting)
@@ -277,19 +247,23 @@ if page_selected == 'Main':
         st.write(f"#### **Recall :** {recall_voting*100:.5f} %")
     with cols[3]:
         st.write(f"#### **F1-Score :** {f1_voting*100:.5f} %")
+    st.write('---')
+    st.write('### Let\'s click the Model in the sidebar to discover your fate!')
 
-    x_new = {'Pclass':[1],
-                   'Sex': [1],
-                   'Age':[0.645],
-                   'SibSp':[0],
-                   'Parch':[0],
-                   'Fare':[0.1],
-                   'Embarked':[1]}
-    df_x_new = pd.DataFrame(x_new)
-    st.write(knn.predict_proba(df_x_new)*100)
-    st.write(svm_model.predict_proba(df_x_new)*100)
-    st.write(tree_model.predict_proba(df_x_new)*100)
-    st.write(voting_model.predict(df_x_new))
+    # Test New Data
+    # x_new = {'Pclass':[1],
+    #                'Sex': [1],
+    #                'Age':[0.645],
+    #                'SibSp':[0],
+    #                'Parch':[0],
+    #                'Fare':[0.1],
+    #                'Embarked':[1]}
+    # df_x_new = pd.DataFrame(x_new)
+    # st.write(knn.predict_proba(df_x_new)*100)
+    # st.write(svm_model.predict_proba(df_x_new)*100)
+    # st.write(tree_model.predict_proba(df_x_new)*100)
+    # st.write(voting_model.predict(df_x_new))
+    # st.write(voting_model.predict_proba(df_x_new)*100)
     
     # st.write('\n')
     # st.write('## Step 3: Model Visualization')
@@ -300,42 +274,26 @@ if page_selected == 'Main':
     # st.write(fig5)
 
 
-
 if page_selected == 'Model':
     st.markdown('#### **Input your data for predict**')
     cols = st.columns(2)
     with cols[0]:
         pClass = st.selectbox('Passenger Class',('1st class','2nd class','3rd class'))
         # st.number_input('Passenger Class (1 = 1st class, 2 = 2nd class, 3 = 3rd class)',min_value=1,max_value=3)
-        # st.number_input('Sex (1 = Male, 2 = Female)',min_value=1,max_value=2)
         age = st.number_input('Age',min_value=1)
         parch = st.number_input('Parents/Children Aboard',min_value=0)
         embarked = st.selectbox('Port of Embarkation',('Cherbourg','Queenstown','Southampton'))
         btn1 = st.button('Predict!')
         
-        
     with cols[1]:
         sex = st.selectbox('Sex',('Male','Female'))
+        # st.number_input('Sex (1 = Male, 2 = Female)',min_value=1,max_value=2)
         sibSp = st.number_input('Siblings/Spouses Aboard',min_value=0)
         fare = st.number_input('Fare (USD)',min_value=0)
-        # st.write('### Data Description')
-        # df_description = pd.DataFrame({
-        #     'Variable': ['Pclass','Age','Parch','SibSp','Embarked'],
-        #     'Definition': ['Ticket class','Age in years','\# of parents / children aboard the Titanic',
-        #                    '\# of siblings / spouses aboard the Titanic',
-        #                    'Port of Embarkation (C = Cherbourg, Q = Queenstown, S = Southampton)']
-        # })
-        # st.table(df_description)
 
-        # code = '''print('hello')'''
-        # st.code(code,language='python')
-        # btn1 = st.button('Run!')
-        # if (btn1):
-        #     st.write('haha')
     if btn1:
-        # scaler = MinMaxScaler()
         import pickle
-        with open('.\model\supervised.pkl', 'rb') as file:
+        with open('./model/supervised(3).pkl', 'rb') as file:
             loaded_model = pickle.load(file)
         x_new = {'Pclass':[pClass],
                    'Sex': [sex],
@@ -348,29 +306,31 @@ if page_selected == 'Model':
         df_x_new['Pclass'] = df_x_new['Pclass'].map({'1st class': 1,'2nd class': 2,'3rd class':3})
         df_x_new['Sex'] = df_x_new['Sex'].map({'Male': 0,'Female': 1})
         df_x_new['Embarked'] = df_x_new['Embarked'].map({'Cherbourg': 0,'Queenstown': 1,'Southampton': 2})
-        columns_to_scale = ['Pclass','Sex','Age','SibSp','Parch','Fare','Embarked']
-        df_new_scaled = df_x_new.copy()
-        # df_new_scaled[columns_to_scale] = loaded_model.transform(df_x_new[columns_to_scale])
-        st.write(df_new_scaled)
-        # df_clean_titanic['Age'] = scaler.fit_transform(df_clean_titanic[['Age']])
-        # df_clean_titanic['SibSp'] = scaler.fit_transform(df_clean_titanic[['SibSp']])
-        # df_clean_titanic['Parch'] = scaler.fit_transform(df_clean_titanic[['Parch']])
-        # df_clean_titanic['Fare'] = scaler.fit_transform(df_clean_titanic[['Fare']])
-        # df_clean_titanic['Embarked'] = scaler.fit_transform(df_clean_titanic[['Embarked']])
-        st.write(df_x_new)
+        scalers = loaded_model['scalers']
+        df_x_new['Pclass'] = scalers['Pclass'].transform(df_x_new[['Pclass']])
+        df_x_new['Sex'] = scalers['Sex'].transform(df_x_new[['Sex']])
+        df_x_new['Age'] = scalers['Age'].transform(df_x_new[['Age']])
+        df_x_new['SibSp'] = scalers['SibSp'].transform(df_x_new[['SibSp']])
+        df_x_new['Parch'] = scalers['Parch'].transform(df_x_new[['Parch']])
+        df_x_new['Fare'] = scalers['Fare'].transform(df_x_new[['Fare']])
+        df_x_new['Embarked'] = scalers['Embarked'].transform(df_x_new[['Embarked']])
+        # st.write(df_x_new)
 
-        
-        prediction = loaded_model.predict(df_x_new)
-        st.write(prediction)
-
-
-        # predict = loaded_model.predict(x_new)
-        # st.write(predict)
-        # x_new_scaled = scaler.transform(x_new)
-        # st.write(x_new_scaled)
-        st.write('Prediction not availible now. Pls wait!!!')
-
-
-
-        
-    
+        prediction = (loaded_model['model'].predict_proba(df_x_new)*100)
+        if (prediction[0,0] > 50):
+            st.markdown(f'#### Your chance of survival from the Titanic disaster is')
+            st.markdown(
+                f"""<p style="font-size: 26px; color: green;font-weight: bold;">
+                {prediction[0, 0]:.5f} %</p>"""
+                , unsafe_allow_html=True)
+        else:
+            st.markdown(f'#### Your chance of survival from the Titanic disaster is')
+            st.markdown(
+                f"""<p style="font-size: 26px; color: red;font-weight: bold;">
+                {prediction[0, 0]:.5f} %</p>"""
+                , unsafe_allow_html=True)
+        st.markdown(
+            """<p style="font-size: 20px;color: red;">
+            <strong> Disclaimer : </strong> The survival predictions are based on data from the Titanic disaster
+            and may not be applicable to other situations. Use the results for entertainment purposes
+            only</p>""",unsafe_allow_html=True)
