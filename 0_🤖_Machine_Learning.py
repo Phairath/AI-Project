@@ -1,7 +1,6 @@
 import streamlit as st
 from streamlit_option_menu import option_menu
 import pandas as pd
-import numpy as np
 import plotly.express as px
 from sklearn.preprocessing import MinMaxScaler
 st.set_page_config(
@@ -28,8 +27,10 @@ st.markdown('<span style="color: red; font-size: 20px;">\****Information about t
 
 @st.cache_data(persist=True)
 def load_data(url):
-    # df_titanic = pd.read_csv('./data/titanic.csv')
-    df = pd.read_csv(url)
+    try:
+        df = pd.read_csv('./data/titanic.csv')
+    except Exception:
+        df = pd.read_csv(url)
     return df
 
 if page_selected == 'Main':
@@ -272,7 +273,6 @@ if page_selected == 'Main':
     # fig5 = px.bar(y=accuracies,x=labels,
     #                 title='Test',width=700)
     # st.write(fig5)
-
 
 if page_selected == 'Model':
     st.markdown('#### **Input your data for predict**')
