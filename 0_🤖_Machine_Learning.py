@@ -17,7 +17,7 @@ with st.sidebar:
 # page_option = st.sidebar.radio('Choose Page', ['Main','Model'])
 # st.sidebar.success("Machine Learning")
 st.sidebar.success('**Explore** the [Titanic Dataset](%s)' %'https://github.com/datasciencedojo/datasets/blob/master/titanic.csv')
-st.sidebar.success('**Created by** Phairath Jaradnaparatana 6604062630382 SEC.2')
+st.sidebar.success('**Created by** [Phairath Jaradnaparatana 6604062630382 SEC.2](%s)' %'https://github.com/Phairath')
 st.sidebar.success("**Powered by** [Streamlit](https://streamlit.io/)")
 
 st.title('🚢 Titanic Survival Simulator: Test Your Fate with Data!')
@@ -77,11 +77,13 @@ if page_selected == 'Main':
         # df_clean_titanic.loc[:,'Embarked'] = scaler.fit_transform(df_clean_titanic[['Embarked']])
     num_shown3 = st.slider('Slide to expand data: ',min_value=5,max_value=len(df_clean_titanic),value=5,key='slider3')
     st.dataframe(df_clean_titanic[:num_shown3])
+
     st.write('### - Remove Missing Values')
     with st.echo():
         df_clean_titanic = df_clean_titanic.dropna()
     num_shown2 = st.slider('Slide to expand data: ',min_value=5,max_value=len(df_clean_titanic),value=5,key='slider2')
     st.dataframe(df_clean_titanic[:num_shown2])
+
     st.write('### - Visualize and Remove Outliers')
     cols = st.columns(2)
     with cols[0]:
