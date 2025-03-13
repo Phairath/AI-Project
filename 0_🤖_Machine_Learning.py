@@ -78,17 +78,15 @@ if page_selected == 'Main':
     st.table(df_description)
     st.write('### - Remove irrelevant columns for model training')
     with st.echo():
-        df_titanic2 = df_titanic.drop(columns=['PassengerId','Name','Ticket','Cabin'])
-    st.write('### - Remove Missing Values')
-    with st.echo():
-        df_clean_titanic = df_titanic2.dropna()
-    num_shown2 = st.slider('Slide to expand data: ',min_value=5,max_value=len(df_clean_titanic),value=5,key='slider2')
-    st.dataframe(df_clean_titanic[:num_shown2])
+        df_clean_titanic = df_titanic.drop(columns=['PassengerId','Name','Ticket','Cabin'])
+
     st.write('### - Transform data')
     st.markdown('**Data Encoding**')
     with st.echo():
         df_clean_titanic['Sex'] = df_clean_titanic['Sex'].map({'male': 0,'female': 1})
         df_clean_titanic['Embarked'] = df_clean_titanic['Embarked'].map({'C': 0,'Q': 1,'S': 2})
+        # df_clean_titanic.loc[:, 'Sex'] = df_clean_titanic['Sex'].map({'male': 0, 'female': 1})
+        # df_clean_titanic.loc[:,'Embarked'] = df_clean_titanic['Embarked'].map({'C': 0,'Q': 1,'S': 2})
     st.markdown('**Data Scaling**')
     with st.echo():
         scaler = MinMaxScaler()
@@ -98,8 +96,19 @@ if page_selected == 'Main':
         df_clean_titanic['Parch'] = scaler.fit_transform(df_clean_titanic[['Parch']])
         df_clean_titanic['Fare'] = scaler.fit_transform(df_clean_titanic[['Fare']])
         df_clean_titanic['Embarked'] = scaler.fit_transform(df_clean_titanic[['Embarked']])
+        # df_clean_titanic.loc[:,'Pclass'] = scaler.fit_transform(df_clean_titanic[['Pclass']])
+        # df_clean_titanic.loc[:,'Age'] = scaler.fit_transform(df_clean_titanic[['Age']])
+        # df_clean_titanic.loc[:,'SibSp'] = scaler.fit_transform(df_clean_titanic[['SibSp']])
+        # df_clean_titanic.loc[:,'Parch'] = scaler.fit_transform(df_clean_titanic[['Parch']])
+        # df_clean_titanic.loc[:,'Fare'] = scaler.fit_transform(df_clean_titanic[['Fare']])
+        # df_clean_titanic.loc[:,'Embarked'] = scaler.fit_transform(df_clean_titanic[['Embarked']])
     num_shown3 = st.slider('Slide to expand data: ',min_value=5,max_value=len(df_clean_titanic),value=5,key='slider3')
     st.dataframe(df_clean_titanic[:num_shown3])
+    st.write('### - Remove Missing Values')
+    with st.echo():
+        df_clean_titanic = df_clean_titanic.dropna()
+    num_shown2 = st.slider('Slide to expand data: ',min_value=5,max_value=len(df_clean_titanic),value=5,key='slider2')
+    st.dataframe(df_clean_titanic[:num_shown2])
     st.write('### - Visualize and Remove Outliers')
     cols = st.columns(2)
     with cols[0]:
@@ -118,10 +127,9 @@ if page_selected == 'Main':
         st.write(fig4)
     with st.echo():
         df_clean_titanic = df_clean_titanic[df_clean_titanic['Age'] < 0.824]
-        df_clean_titanic = df_clean_titanic[df_clean_titanic['SibSp'] < 0.6]
+        df_clean_titanic = df_clean_titanic[df_clean_titanic['SibSp'] < 0.375]
         df_clean_titanic = df_clean_titanic[df_clean_titanic['Parch'] < 0.5]
         df_clean_titanic = df_clean_titanic[df_clean_titanic['Fare'] < 0.138]
-
         # df_clean_titanic.drop(df_clean_titanic[df_clean_titanic['Age'] >= 0.824].index,inplace=True)
         # df_clean_titanic.drop(df_clean_titanic[df_clean_titanic['SibSp'] >= 0.6].index,inplace=True)
         # df_clean_titanic.drop(df_clean_titanic[df_clean_titanic['Parch'] >= 0.5].index,inplace=True)
@@ -270,6 +278,19 @@ if page_selected == 'Main':
     with cols[3]:
         st.write(f"#### **F1-Score :** {f1_voting*100:.5f} %")
 
+    x_new = {'Pclass':[1],
+                   'Sex': [1],
+                   'Age':[0.645],
+                   'SibSp':[0],
+                   'Parch':[0],
+                   'Fare':[0.1],
+                   'Embarked':[1]}
+    df_x_new = pd.DataFrame(x_new)
+    st.write(knn.predict_proba(df_x_new)*100)
+    st.write(svm_model.predict_proba(df_x_new)*100)
+    st.write(tree_model.predict_proba(df_x_new)*100)
+    st.write(voting_model.predict(df_x_new))
+    
     # st.write('\n')
     # st.write('## Step 3: Model Visualization')
     # accuracies = [accuracy_knn*100, accuracy_svm*100, accuracy_tree*100, accuracy_voting*100]
