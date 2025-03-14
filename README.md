@@ -1,6 +1,7 @@
 # AI-Project
-## How to Run the Web App Locally
+You can visit the website at [www.example.com](http://www.example.com), but if you're unable to open the website through the link, you can follow these steps:
 
+## How to Run the Web App Locally
 Follow these steps to run the Streamlit app locally on your machine:
 ### 1. Download this Project and Install Streamlit (if not installed)
 First, make sure **Streamlit** is installed on your machine. If it's not installed yet, you can install it using the following command:
