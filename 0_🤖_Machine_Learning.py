@@ -40,12 +40,15 @@ if page_selected == 'Main':
     num_shown = st.slider('Slide to expand data: ',min_value=5,max_value=len(df_titanic),value=5,key='slider1')
     st.dataframe(df_titanic[:num_shown])
 
-    st.write('### - Data Description (Focus on Abbreviated Features)')
+    st.write('### - Data Description') #(Focus on Abbreviated Features)')
     df_description = pd.DataFrame({
         'Variable': ['Pclass','Parch','SibSp','Embarked'],
+        'Data Type' : ['Pclass','Parch','SibSp','Embarked'],
+        'Feature Type' : ['Pclass','Parch','SibSp','Embarked'],
         'Definition': ['Ticket class','\# of parents / children aboard the Titanic',
                         '\# of siblings / spouses aboard the Titanic',
                         'Port of Embarkation (C = Cherbourg, Q = Queenstown, S = Southampton)']
+        
     })
     st.table(df_description)
 
@@ -282,16 +285,16 @@ if page_selected == 'Model':
     with cols[0]:
         pClass = st.selectbox('Passenger Class',('1st class','2nd class','3rd class'))
         # st.number_input('Passenger Class (1 = 1st class, 2 = 2nd class, 3 = 3rd class)',min_value=1,max_value=3)
-        age = st.number_input('Age',min_value=1)
-        parch = st.number_input('Parents/Children Aboard',min_value=0)
+        age = st.number_input('Age',min_value=1,value=35)
+        parch = st.number_input('Parents/Children Aboard',min_value=0,value=1)
         embarked = st.selectbox('Port of Embarkation',('Cherbourg','Queenstown','Southampton'))
         btn1 = st.button('Predict!')
         
     with cols[1]:
         sex = st.selectbox('Sex',('Male','Female'))
         # st.number_input('Sex (1 = Male, 2 = Female)',min_value=1,max_value=2)
-        sibSp = st.number_input('Siblings/Spouses Aboard',min_value=0)
-        fare = st.number_input('Fare (USD)',min_value=0)
+        sibSp = st.number_input('Siblings/Spouses Aboard',min_value=0,value=0)
+        fare = st.number_input('Fare (USD)',min_value=0,value=100)
 
     if btn1:
         import pickle
