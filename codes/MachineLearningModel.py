@@ -10,10 +10,10 @@ from sklearn.model_selection import train_test_split
 def load_data(url):
     try:
         df = pd.read_csv('./data/titanic.csv')
+        return df
     except Exception:
         df = pd.read_csv(url)
-    return df
-
+    
 df_titanic = load_data('https://raw.githubusercontent.com/datasciencedojo/datasets/refs/heads/master/titanic.csv')
 df_clean_titanic = df_titanic.drop(columns=['PassengerId','Name','Ticket','Cabin'])
 df_clean_titanic['Sex'] = df_clean_titanic['Sex'].map({'male': 0, 'female': 1})
@@ -48,8 +48,7 @@ tree_model.fit(x_train,y_train)
 voting_model = VotingClassifier(estimators=[
             ('decision_tree', tree_model),
             ('svm', svm_model),
-            ('knn', knn)
-            ], voting='soft')
+            ('knn', knn)], voting='soft')
 voting_model.fit(x_train, y_train)
 
 df_titanic = df_titanic.drop(columns=['PassengerId','Name','Ticket','Cabin'])
