@@ -1,5 +1,5 @@
 # AI-Project
-You can visit the website at [www.example.com](http://www.example.com), but if you're unable to open the website through the link, you can follow these steps:
+You can visit the website at [My Website](https://phairath-ai-project.streamlit.app/), but if you're unable to open the website through the link, you can follow these steps:
 
 ## How to Run the Web App Locally
 Follow these steps to run the Streamlit app locally on your machine:
