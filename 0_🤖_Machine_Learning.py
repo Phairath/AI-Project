@@ -36,19 +36,21 @@ def load_data(url):
 if page_selected == 'Main':
     st.write('## Step 1: Exploratory Data Analysis (EDA)')
     df_titanic = load_data('https://raw.githubusercontent.com/datasciencedojo/datasets/refs/heads/master/titanic.csv')
-    # st.dataframe(df_titanic)
     num_shown = st.slider('Slide to expand data: ',min_value=5,max_value=len(df_titanic),value=5,key='slider1')
     st.dataframe(df_titanic[:num_shown])
 
     st.write('### - Data Description') #(Focus on Abbreviated Features)')
     df_description = pd.DataFrame({
-        'Variable': ['Pclass','Parch','SibSp','Embarked'],
-        'Data Type' : ['Pclass','Parch','SibSp','Embarked'],
-        'Feature Type' : ['Pclass','Parch','SibSp','Embarked'],
-        'Definition': ['Ticket class','\# of parents / children aboard the Titanic',
+        'Variable': ['Passenger Id','Pclass','Name','Sex','Age','Parch','SibSp',
+                     'Ticket','Fare','Embarked','Cabin','Survived'],
+        'Data Type' : ['Discrete','Ordinal','Nominal','Nominal',
+                       'Continuous','Discrete','Discrete','Nominal',
+                       'Continuous','Nominal','Nominal','Nominal'],
+        'Definition': ['Passenger Id','Ticket (class 1 = 1st, 2 = 2nd, 3 = 3rd)','Name','Sex','Age in years',
+                       '\# of parents / children aboard the Titanic',
                         '\# of siblings / spouses aboard the Titanic',
-                        'Port of Embarkation (C = Cherbourg, Q = Queenstown, S = Southampton)']
-        
+                        'Ticket number','Passenger fare','Port of Embarkation (C=Cherbourg,Q=Queenstown,S=Southampton)',
+                        'Cabin number','Survival (0 = No, 1 = Yes)']
     })
     st.table(df_description)
 
@@ -78,14 +80,14 @@ if page_selected == 'Main':
         # df_clean_titanic.loc[:,'Parch'] = scaler.fit_transform(df_clean_titanic[['Parch']])
         # df_clean_titanic.loc[:,'Fare'] = scaler.fit_transform(df_clean_titanic[['Fare']])
         # df_clean_titanic.loc[:,'Embarked'] = scaler.fit_transform(df_clean_titanic[['Embarked']])
-    num_shown3 = st.slider('Slide to expand data: ',min_value=5,max_value=len(df_clean_titanic),value=5,key='slider3')
-    st.dataframe(df_clean_titanic[:num_shown3])
+    num_shown2 = st.slider('Slide to expand data: ',min_value=5,max_value=len(df_clean_titanic),value=5,key='slider2')
+    st.dataframe(df_clean_titanic[:num_shown2])
 
     st.write('### - Remove Missing Values')
     with st.echo():
         df_clean_titanic = df_clean_titanic.dropna()
-    num_shown2 = st.slider('Slide to expand data: ',min_value=5,max_value=len(df_clean_titanic),value=5,key='slider2')
-    st.dataframe(df_clean_titanic[:num_shown2])
+    num_shown3 = st.slider('Slide to expand data: ',min_value=5,max_value=len(df_clean_titanic),value=5,key='slider3')
+    st.dataframe(df_clean_titanic[:num_shown3])
 
     st.write('### - Visualize and Remove Outliers')
     cols = st.columns(2)
@@ -132,15 +134,18 @@ if page_selected == 'Main':
         from sklearn.neighbors import KNeighborsClassifier
         from sklearn.model_selection import train_test_split
         from sklearn.metrics import accuracy_score, precision_score, recall_score, f1_score
+
     st.write('**2. Split Dataset with 70% for Training and 30% for Testing**')
     with st.echo():
         x = df_clean_titanic.drop(columns=['Survived'])
         y = df_clean_titanic['Survived']
         x_train, x_test, y_train, y_test = train_test_split(x, y, test_size=0.30, random_state=99)
-    st.write('**3. Create and Train KNN Model with neighbors=4**')
+
+    st.write('**3. Create and Train KNN Model with neighbors = 4**')
     with st.echo():
         knn = KNeighborsClassifier(n_neighbors = 4)
         knn.fit(x_train,y_train)
+
     st.write('**4. Evaluate KNN Model**')
     with st.echo():
         predict_knn = knn.predict(x_test)
@@ -149,7 +154,7 @@ if page_selected == 'Main':
         recall_knn = recall_score(y_test, predict_knn, average="macro")
         f1_knn = f1_score(y_test, predict_knn, average="macro")
         # conf_matrix_knn = confusion_matrix(y_test, predict_knn)
-    # st.write("KNN efficiency \n")
+    # st.write("KNN Efficiency \n")
     cols = st.columns(4)
     with cols[0]:
         st.write(f"#### **Accuracy :** {accuracy_knn*100:.5f} %")
@@ -236,8 +241,7 @@ if page_selected == 'Main':
         voting_model = VotingClassifier(estimators=[
             ('decision_tree', tree_model),
             ('svm', svm_model),
-            ('knn', knn)
-            ], voting='soft')
+            ('knn', knn)], voting='soft')
         voting_model.fit(x_train, y_train)
         predict_voting = voting_model.predict(x_test)
         accuracy_voting = accuracy_score(y_test,predict_voting)
@@ -284,7 +288,6 @@ if page_selected == 'Model':
     cols = st.columns(2)
     with cols[0]:
         pClass = st.selectbox('Passenger Class',('1st class','2nd class','3rd class'))
-        # st.number_input('Passenger Class (1 = 1st class, 2 = 2nd class, 3 = 3rd class)',min_value=1,max_value=3)
         age = st.number_input('Age',min_value=1,value=35)
         parch = st.number_input('Parents/Children Aboard',min_value=0,value=1)
         embarked = st.selectbox('Port of Embarkation',('Cherbourg','Queenstown','Southampton'))
@@ -292,13 +295,12 @@ if page_selected == 'Model':
         
     with cols[1]:
         sex = st.selectbox('Sex',('Male','Female'))
-        # st.number_input('Sex (1 = Male, 2 = Female)',min_value=1,max_value=2)
         sibSp = st.number_input('Siblings/Spouses Aboard',min_value=0,value=0)
         fare = st.number_input('Fare (USD)',min_value=0,value=100)
 
     if btn1:
         import pickle
-        with open('./model/supervised(3).pkl', 'rb') as file:
+        with open('./model/supervised.pkl', 'rb') as file:
             loaded_model = pickle.load(file)
         x_new = {'Pclass':[pClass],
                    'Sex': [sex],
@@ -311,6 +313,7 @@ if page_selected == 'Model':
         df_x_new['Pclass'] = df_x_new['Pclass'].map({'1st class': 1,'2nd class': 2,'3rd class':3})
         df_x_new['Sex'] = df_x_new['Sex'].map({'Male': 0,'Female': 1})
         df_x_new['Embarked'] = df_x_new['Embarked'].map({'Cherbourg': 0,'Queenstown': 1,'Southampton': 2})
+
         scalers = loaded_model['scalers']
         df_x_new['Pclass'] = scalers['Pclass'].transform(df_x_new[['Pclass']])
         df_x_new['Sex'] = scalers['Sex'].transform(df_x_new[['Sex']])
@@ -323,7 +326,7 @@ if page_selected == 'Model':
 
         prediction = (loaded_model['model'].predict_proba(df_x_new)*100)
         if (prediction[0,0] > 50):
-            st.markdown(f'#### Your chance of survival from the Titanic disaster is')
+            st.markdown('#### Your chance of survival from the Titanic disaster is')
             st.markdown(
                 f"""<p style="font-size: 26px; color: green;font-weight: bold;">
                 {prediction[0, 0]:.5f} %</p>"""
