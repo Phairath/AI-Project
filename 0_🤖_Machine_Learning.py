@@ -291,13 +291,13 @@ if page_selected == 'Model':
         age = st.number_input('Age',min_value=1,value=35)
         parch = st.number_input('Parents/Children Aboard',min_value=0,value=1)
         embarked = st.selectbox('Port of Embarkation',('Cherbourg','Queenstown','Southampton'))
-        btn1 = st.button('Predict!')
-        
+         
     with cols[1]:
         sex = st.selectbox('Sex',('Male','Female'))
         sibSp = st.number_input('Siblings/Spouses Aboard',min_value=0,value=0)
         fare = st.number_input('Fare (USD)',min_value=0,value=100)
-
+    btn1 = st.button('Predict!')
+    
     if btn1:
         import pickle
         with open('./model/supervised.pkl', 'rb') as file:

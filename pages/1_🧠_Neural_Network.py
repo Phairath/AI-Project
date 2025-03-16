@@ -128,11 +128,11 @@ if page_selected == 'Model':
         # speed_impact = st.number_input('Speed of Impact (km/hr) (2 digits)',min_value=0.0,step=.01,format='%.2f')
         speed_impact = st.number_input('Speed of Impact (km/hr)',min_value=1,value=60)
         seatbelt = st.selectbox('Seatbelt Used',('Yes','No'))
-        btn1 = st.button('Predict!')
         
     with cols[1]:
         sex = st.selectbox('Sex',('Male','Female'))
         helmet = st.selectbox('Helmet Used',('Yes','No'))
+    btn1 = st.button('Predict!')
 
     if btn1:
         import tensorflow as tf
